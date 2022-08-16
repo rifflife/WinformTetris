@@ -57,6 +57,8 @@ public class TetrisGame
 	public static readonly Color ThemeColor = Color.DarkGray;
 	private int mCellSize = 20;
 
+	private bool mIsHoldedOnce;
+
 	public TetrisGame()
 	{
 		mGameMap = new TileGrid(10, 20);
@@ -78,6 +80,7 @@ public class TetrisGame
 
 		Score = 0;
 		mHold = null;
+		mIsHoldedOnce = false;
 		mCurrentMino = null;
 		mMinoQueue.Clear();
 		fillRandomMino();
@@ -101,6 +104,7 @@ public class TetrisGame
 				}
 
 				popMino();
+				mIsHoldedOnce = false;
 			}
 			else
 			{
@@ -113,6 +117,13 @@ public class TetrisGame
 
 	public void Hold()
 	{
+		if (mIsHoldedOnce)
+		{
+			return;
+		}
+
+		mIsHoldedOnce = true;
+
 		if (mHold == null)
 		{
 			mHold = mCurrentMino;

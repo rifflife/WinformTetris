@@ -76,15 +76,15 @@ public class InputManager
 		{ GameKey.MoveRight, Keys.Right },
 		
 		// Rotating
-		{ GameKey.RotateLeft, Keys.X },
-		{ GameKey.RotateRight, Keys.C },
+		{ GameKey.RotateLeft, Keys.Z },
+		{ GameKey.RotateRight, Keys.X },
 
 		// Dropping
 		{ GameKey.SoftDrop, Keys.Down },
 		{ GameKey.HardDrop, Keys.Space },
 
 		// Holding
-		{ GameKey.Hold, Keys.Z },
+		{ GameKey.Hold, Keys.ShiftKey },
 	};
 
 	private Dictionary<Keys, InputData> mInputTable = new()
@@ -94,15 +94,15 @@ public class InputManager
 		{ Keys.Right, new InputData() },
 
 		// Rotating
+		{ Keys.Z, new InputData() },
 		{ Keys.X, new InputData() },
-		{ Keys.C, new InputData() },
 
 		// Dropping
 		{ Keys.Down, new InputData() },
 		{ Keys.Space, new InputData() },
 
 		// Holding
-		{ Keys.Z, new InputData() },
+		{ Keys.ShiftKey, new InputData() },
 	};
 
 	public InputData GetInputData(GameKey gameKey)

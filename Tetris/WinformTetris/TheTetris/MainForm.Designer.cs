@@ -111,9 +111,9 @@
 			this.Label_Info.AutoSize = true;
 			this.Label_Info.Location = new System.Drawing.Point(10, 127);
 			this.Label_Info.Name = "Label_Info";
-			this.Label_Info.Size = new System.Drawing.Size(65, 180);
+			this.Label_Info.Size = new System.Drawing.Size(65, 195);
 			this.Label_Info.TabIndex = 14;
-			this.Label_Info.Text = "# 컨트롤\r\n* 방향키\r\n이동\r\n\r\n* Z, X\r\n회전\r\n\r\n* Space\r\n하드 드랍\r\n\r\n* Left Shift\r\n홀드";
+			this.Label_Info.Text = "# 컨트롤\r\n\r\n* 방향키\r\n이동\r\n\r\n* Z, X\r\n회전\r\n\r\n* Space\r\n하드 드랍\r\n\r\n* Left Shift\r\n홀드";
 			// 
 			// Label_State
 			// 
