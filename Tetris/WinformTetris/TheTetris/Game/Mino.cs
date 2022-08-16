@@ -7,8 +7,6 @@ using System.Threading.Tasks;
 
 public class Mino : TileGrid
 {
-	public const int AREA_SIZE = 4;
-
 	private Mino(Color blockColor, bool[,] area) : base(blockColor, area)
 	{
 		if (Height != Width)
@@ -65,23 +63,21 @@ public class Mino : TileGrid
 		Area = rotateArea;
 	}
 
-	public static Mino LMino => new Mino(Color.Orange, new bool[AREA_SIZE, AREA_SIZE]
+	public static Mino LMino => new Mino(Color.Orange, new bool[3, 3]
 		{
-			{ false, false, false, false },
-			{ false, true, false, false },
-			{ false, true, false, false },
-			{ false, true, true, false },
+			{ true, false, false },
+			{ true, false, false },
+			{ true, true, false },
 		});
 
-	public static Mino JMino => new Mino(Color.Blue, new bool[AREA_SIZE, AREA_SIZE]
+	public static Mino JMino => new Mino(Color.Blue, new bool[3, 3]
 		{
-			{ false, false, false, false },
-			{ false, false, true, false },
-			{ false, false, true, false },
-			{ false, true, true, false },
+			{ false, false, true },
+			{ false, false, true },
+			{ false, true, true },
 		});
 
-	public static Mino OMino => new Mino(Color.Yellow, new bool[AREA_SIZE, AREA_SIZE]
+	public static Mino OMino => new Mino(Color.Yellow, new bool[4, 4]
 		{
 			{ false, false, false, false },
 			{ false, true, true, false },
@@ -89,23 +85,21 @@ public class Mino : TileGrid
 			{ false, false, false, false },
 		});
 
-	public static Mino ZMino => new Mino(Color.Red, new bool[AREA_SIZE, AREA_SIZE]
+	public static Mino ZMino => new Mino(Color.Red, new bool[3, 3]
 		{
-			{ false, false, false, false },
-			{ true, true, false, false },
-			{ false, true, true, false },
-			{ false, false, false, false },
+			{ true, true, false },
+			{ false, true, true },
+			{ false, false, false },
 		});
 
-	public static Mino SMino => new Mino(Color.Green, new bool[AREA_SIZE, AREA_SIZE]
+	public static Mino SMino => new Mino(Color.Green, new bool[3, 3]
 		{
-			{ false, false, false, false },
-			{ false, false, true, true },
-			{ false, true, true, false },
-			{ false, false, false, false },
+			{ false, true, true },
+			{ true, true, false },
+			{ false, false, false },
 		});
 
-	public static Mino IMino => new Mino(Color.Cyan, new bool[AREA_SIZE, AREA_SIZE]
+	public static Mino IMino => new Mino(Color.Cyan, new bool[4, 4]
 		{
 			{ false, true, false, false },
 			{ false, true, false, false },
@@ -113,11 +107,10 @@ public class Mino : TileGrid
 			{ false, true, false, false },
 		});
 
-	public static Mino TMino => new Mino(Color.Magenta, new bool[AREA_SIZE, AREA_SIZE]
+	public static Mino TMino => new Mino(Color.Magenta, new bool[3, 3]
 		{
-			{ false, false, false, false },
-			{ true, true, true, false },
-			{ false, true, false, false },
-			{ false, false, false, false },
+			{ true, true, true },
+			{ false, true, false },
+			{ false, false, false },
 		});
 }

@@ -13,7 +13,10 @@ public class TileGrid
 
 	public bool this[int y, int x] => Area[y, x].IsFilled;
 
-	public TileGrid() { }
+	public TileGrid()
+	{
+		Area = new Block[0,0];
+	}
 
 	public TileGrid(int width, int height)
 	{

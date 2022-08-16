@@ -54,7 +54,7 @@ public class TetrisGame
 	private Random mRandom = new();
 
 	// Drawing
-	public static readonly Color ThemeColor = Color.DarkGray;
+	public static readonly Color ThemeColor = Color.FromArgb(40, 40, 40);
 	private int mCellSize = 20;
 
 	private bool mIsHoldedOnce;
