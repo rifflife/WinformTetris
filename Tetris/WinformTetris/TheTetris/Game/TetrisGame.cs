@@ -26,69 +26,97 @@ public struct Block
 	public Block(bool isFilled)
 	{
 		IsFilled = isFilled;
-		BlockColor = Color.White;
+		BlockColor = TetrisGame.ThemeColor;
 	}
 }
 
 public class TetrisGame
 {
 	public event Action<GameResult>? OnGameFinished = null;
+	public event Action<int>? OnScoreChanged = null;
 
 	// Map Data
 	private TileGrid mGameMap;
 
 	// Mino Data
-	private List<Mino> mMinos;
-	private Queue<Mino> mMinoQueue = new Queue<Mino>(10);
+	private List<Mino> mBaseMinos;
+	private List<Mino> mMinoQueue = new List<Mino>(10);
 
 	// Gameplay Data
 	private Mino? mHold = null;
 	private Mino? mCurrentMino = null;
 
-	private int mCurrentMinoX = 0;
-	private int mCurrentMinoY = 0;
+	private TileCoord mMinoPos;
 
-	private int mScore = 0;
+	public int Score { get; private set; }
 
 	// Muse
 	private Random mRandom = new();
+
+	// Drawing
+	public static readonly Color ThemeColor = Color.DarkGray;
+	private int mCellSize = 20;
 
 	public TetrisGame()
 	{
 		mGameMap = new TileGrid(10, 20);
 
-		mMinos = new List<Mino>(7);
+		mBaseMinos = new List<Mino>(7);
 
-		mMinos.Add(Mino.LMino);
-		mMinos.Add(Mino.JMino);
-		mMinos.Add(Mino.OMino);
-		mMinos.Add(Mino.ZMino);
-		mMinos.Add(Mino.SMino);
-		mMinos.Add(Mino.IMino);
-		mMinos.Add(Mino.TMino);
+		mBaseMinos.Add(Mino.LMino);
+		mBaseMinos.Add(Mino.JMino);
+		mBaseMinos.Add(Mino.OMino);
+		mBaseMinos.Add(Mino.ZMino);
+		mBaseMinos.Add(Mino.SMino);
+		mBaseMinos.Add(Mino.IMino);
+		mBaseMinos.Add(Mino.TMino);
 	}
 
 	public void Initialize()
 	{
 		mGameMap.Clear();
 
+		Score = 0;
 		mHold = null;
 		mCurrentMino = null;
 		mMinoQueue.Clear();
-		FillRandomMino();
+		fillRandomMino();
+		popMino();
 	}
 
-	private void rotateCurrentMino(bool isRightAngle)
+	public void Tick()
 	{
+		if (mCurrentMino != null)
+		{
+			if (mGameMap.IsCollideWith(mCurrentMino, mMinoPos, TileCoord.Down))
+			{
+				mGameMap.AddArea(mCurrentMino, mMinoPos);
+				int removedLineCount = mGameMap.GetMatchLinesAndShift();
+				Score += removedLineCount * 100;
+				OnScoreChanged?.Invoke(Score);
 
+				if (mMinoPos.Y == 0)
+				{
+					OnGameFinished?.Invoke(GameResult.Lose);
+				}
+
+				popMino();
+			}
+			else
+			{
+				mMinoPos += TileCoord.Down;
+			}
+		}
 	}
 
-	private void holdMino()
+	// Input
+
+	public void Hold()
 	{
 		if (mHold == null)
 		{
 			mHold = mCurrentMino;
-			PopMino();
+			popMino();
 		}
 		else
 		{
@@ -100,100 +128,118 @@ public class TetrisGame
 		resetMinoPosition();
 	}
 
-	private void PopMino()
+	public bool TryMove(TileCoord direction)
 	{
-		mCurrentMino = mMinoQueue.Dequeue();
+		if (mCurrentMino == null)
+		{
+			return false;
+		}
+
+		if (mGameMap.IsCollideWith(mCurrentMino, mMinoPos, direction))
+		{
+			return false;
+		}
+
+		mMinoPos += direction;
+		return true;
+	}
+
+	public bool TryRotate(bool isRightAngle)
+	{
+		if (mCurrentMino == null)
+		{
+			return false;
+		}
+
+		mCurrentMino.Rotate(isRightAngle);
+
+		if (mGameMap.IsCollideWith(mCurrentMino, mMinoPos, TileCoord.Zero))
+		{
+			mCurrentMino.Rotate(!isRightAngle);
+			return false;
+		}
+
+		return true;
+	}
+
+	// Logic
+
+	private void popMino()
+	{
+		mCurrentMino = mMinoQueue[0];
+
+		mMinoQueue.RemoveAt(0);
+
 		if (mMinoQueue.Count < 3)
 		{
-			FillRandomMino();
+			fillRandomMino();
 		}
 
 		resetMinoPosition();
+
+		if (mGameMap.IsCollideWith(mCurrentMino, mMinoPos, TileCoord.Zero))
+		{
+			OnGameFinished?.Invoke(GameResult.Lose);
+		}
 	}
 
-	private void resetMinoPosition()
+	private void fillRandomMino()
 	{
-		mCurrentMinoX = 3;
-		mCurrentMinoY = 20;
-	}
-
-	public void Start()
-	{
-
-	}
-
-	private void tick()
-	{
-		mCurrentMinoY++;
-	}
-
-	private void checkLines()
-	{
-
-	}
-
-	public void Draw()
-	{
-
-	}
-
-	private void FillRandomMino()
-	{
-		int n = mMinos.Count;
+		int n = mBaseMinos.Count;
 		while (n > 1)
 		{
 			n--;
 			int k = mRandom.Next(n + 1);
-			Mino temp = mMinos[k];
-			mMinos[k] = mMinos[n];
-			mMinos[n] = temp;
+			Mino temp = mBaseMinos[k];
+			mBaseMinos[k] = mBaseMinos[n];
+			mBaseMinos[n] = temp;
 		}
 
-		foreach (Mino m in mMinos)
+		foreach (Mino m in mBaseMinos)
 		{
-			mMinoQueue.Enqueue(m.Clone());
+			mMinoQueue.Add(m.Clone());
 		}
 	}
 
-	//private bool isCurrentMinoCollideBy(TileCoord direction)
-	//{
-	//	if (mCurrentMino == null)
-	//	{
-	//		return false;
-	//	}
+	private void resetMinoPosition()
+	{
+		mMinoPos = new TileCoord(3, 0);
+	}
 
-	//	var minoArea = mCurrentMino.Area;
+	// Drawing
 
-	//	for (int y = 0; y < mCurrentMino.Height; y++)
-	//	{
-	//		for (int x = 0; x < mCurrentMino.Width; x++)
-	//		{
-	//			if (!mCurrentMino[y, x])
-	//			{
-	//				continue;
-	//			}
+	public void DrawMap(Graphics g)
+	{
+		g.Clear(ThemeColor);
+		
+		mGameMap.Draw(g, mCellSize, TileCoord.Zero);
+		mCurrentMino?.Draw(g, mCellSize, mMinoPos);
+	}
 
-	//			// 영역을 벗어난 경우 충돌한 것으로 간주
-	//			if (!isValidPosition(new TileCoord(x, y) + direction))
-	//			{
-	//				return true;
-	//			}
+	public void DrawQueue(Graphics g)
+	{
+		g.Clear(ThemeColor);
 
-				
-	//		}
-	//	}
+		if (mMinoQueue.Count < 3)
+		{
+			return;
+		}
 
+		for (int i = 0; i < 3; i++)
+		{
+			mMinoQueue[i].Draw(g, mCellSize, (TileCoord.Down * 4 + TileCoord.Down) * i);
+		}
+	}
 
-	//}
+	public void DrawHold(Graphics g)
+	{
+		g.Clear(ThemeColor);
 
-	//private bool isValidPosition(TileCoord position)
-	//{
-	//	return isValidPosition(position.X, position.Y);
-	//}
+		if (mHold == null)
+		{
+			return;
+		}
 
-	//private bool isValidPosition(int x, int y)
-	//{
-	//	return !(x < 0 || x >= mWidth || y < 0 || y >= mHeight);
-	//}
-
+		mHold.Draw(g, mCellSize, TileCoord.Zero);
+	}
 }

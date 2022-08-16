@@ -8,35 +8,33 @@ using System.Threading.Tasks;
 public class Mino : TileGrid
 {
 	public const int AREA_SIZE = 4;
-	public Color MinoColor { get; private set;}
 
-	private Mino(Color blockColor, bool[,] area)
-		: base(area.GetLength(1), area.GetLength(0))
+	private Mino(Color blockColor, bool[,] area) : base(blockColor, area)
 	{
-		MinoColor = blockColor;
-
 		if (Height != Width)
 		{
 			throw new ArgumentException("Mino의 영역 크기는 반드시 정사각형이어야 합니다.");
 		}
+	}
 
-		Area = new Block[Height, Width];
+	public Mino(Mino copy)
+	{
+		this.Width = copy.Width;
+		this.Height = copy.Height;
+		this.Area = new Block[this.Height, this.Width];
 
-		for (int y = 0; y < Height; y++)
+		for (int y = 0; y < this.Width; y++)
 		{
-			for (int x = 0; x < Width; x++)
+			for (int x = 0; x < this.Height; x++)
 			{
-				Area[y, x] = new Block(false, blockColor);
+				this.Area[y, x] = copy.Area[y, x];
 			}
 		}
 	}
 
 	public Mino Clone()
 	{
-		bool[,] newArea = new bool[Height, Width];
-		Array.Copy(this.Area, newArea, this.Area.Length);
-
-		return new Mino(MinoColor, newArea);
+		return new Mino(this);
 	}
 
 	public void Rotate(bool isRight)
@@ -49,7 +47,7 @@ public class Mino : TileGrid
 			{
 				for (int x = 0; x < Width; x++)
 				{
-					rotateArea[x, Width - 1 - y] = Area[y, x];
+					rotateArea[x, Height - 1 - y] = Area[y, x];
 				}
 			}
 		}
@@ -59,10 +57,12 @@ public class Mino : TileGrid
 			{
 				for (int x = 0; x < Width; x++)
 				{
-					rotateArea[Height - 1 - x, y] = Area[y, x];
+					rotateArea[Width - 1 - x, y] = Area[y, x];
 				}
 			}
 		}
+
+		Area = rotateArea;
 	}
 
 	public static Mino LMino => new Mino(Color.Orange, new bool[AREA_SIZE, AREA_SIZE]
@@ -105,7 +105,7 @@ public class Mino : TileGrid
 			{ false, false, false, false },
 		});
 
-	public static Mino IMino => new Mino(Color.Green, new bool[AREA_SIZE, AREA_SIZE]
+	public static Mino IMino => new Mino(Color.Cyan, new bool[AREA_SIZE, AREA_SIZE]
 		{
 			{ false, true, false, false },
 			{ false, true, false, false },
